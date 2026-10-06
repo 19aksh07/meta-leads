@@ -1,0 +1,14 @@
+{
+  "expo": {
+    "name": "Meta Lead Feed",
+    "slug": "meta-lead-feed",
+    "scheme": "metaleadfeed",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "plugins": ["expo-router"],
+    "experiments": {
+      "typedRoutes": true
+    }
+  }
+}
