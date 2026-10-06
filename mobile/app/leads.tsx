@@ -15,6 +15,7 @@ export default function LeadsScreen({ socketUrl }: { socketUrl?: string } = {}) 
   const {
     leads,
     connected,
+    mode,
     loading,
     creating,
     deletingId,
@@ -27,7 +28,23 @@ export default function LeadsScreen({ socketUrl }: { socketUrl?: string } = {}) 
   const [email, setEmail] = useState('android-test@example.com');
   const [phoneNumber, setPhoneNumber] = useState('+15555550100');
   const [actionError, setActionError] = useState<string | null>(null);
-  const testLead = leads.find((lead) => lead.is_test_lead);
+  const testLead =
+    mode === 'meta'
+      ? leads.find((lead) => lead.is_test_lead && !lead.is_mock_lead)
+      : undefined;
+
+  const handleDeleteLead = async (leadId: string) => {
+    setActionError(null);
+    try {
+      await deleteTestLead(leadId);
+    } catch (deleteError) {
+      setActionError(
+        deleteError instanceof Error
+          ? deleteError.message
+          : 'Could not delete the lead',
+      );
+    }
+  };
 
   const handleCreate = async () => {
     setActionError(null);
@@ -98,14 +115,30 @@ export default function LeadsScreen({ socketUrl }: { socketUrl?: string } = {}) 
           ]}
           data={leads}
           keyExtractor={(lead) => lead.id}
-          renderItem={({ item }) => <LeadListItem lead={item} />}
+          renderItem={({ item }) => (
+            <LeadListItem
+              lead={item}
+              deleting={deletingId === item.id}
+              onDelete={
+                item.is_test_lead
+                  ? () => void handleDeleteLead(item.id)
+                  : undefined
+              }
+            />
+          )}
           ListHeaderComponent={
             <View style={styles.testCard}>
               <View style={styles.cardHeading}>
                 <View style={styles.cardCopy}>
-                  <Text style={styles.cardTitle}>Create a Meta test lead</Text>
+                  <Text style={styles.cardTitle}>
+                    {mode === 'mock'
+                      ? 'Create a mock lead'
+                      : 'Create a Meta test lead'}
+                  </Text>
                   <Text style={styles.cardSubtitle}>
-                    Creates a fake lead for your configured form.
+                    {mode === 'mock'
+                      ? 'Creates a local sample lead you can view in this feed.'
+                      : 'Creates a fake lead for your configured form.'}
                   </Text>
                 </View>
                 <Pressable
@@ -155,10 +188,12 @@ export default function LeadsScreen({ socketUrl }: { socketUrl?: string } = {}) 
               >
                 <Text style={styles.createButtonText}>
                   {loading
-                    ? 'Loading current test lead…'
+                    ? 'Loading leads…'
                     : creating
                       ? 'Creating…'
-                      : 'Create test lead'}
+                      : mode === 'mock'
+                        ? 'Create mock lead'
+                        : 'Create test lead'}
                 </Text>
               </Pressable>
 
@@ -183,8 +218,9 @@ export default function LeadsScreen({ socketUrl }: { socketUrl?: string } = {}) 
                 </Text>
               ) : null}
               <Text style={styles.note}>
-                Meta allows one test lead per form at a time. This does not
-                create a real ad lead.
+                {mode === 'mock'
+                  ? 'Mock leads are local to this backend and clear when it restarts. They are not sent to Meta.'
+                  : 'Meta allows one test lead per form at a time. This does not create a real ad lead.'}
               </Text>
             </View>
           }

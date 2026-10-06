@@ -8,5 +8,7 @@ export type Lead = {
   email?: string;
   phone_number?: string;
   phone?: string;
+  is_test_lead?: boolean;
+  is_mock_lead?: boolean;
   [field: string]: unknown;
 };

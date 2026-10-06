@@ -11,9 +11,9 @@
   spend or real user data is required.
 - `META_GRAPH_API_MOCK=true` is used because creating Instant Forms requires a
   connected, verified Business Portfolio, which is out of scope for this PoC.
-  Only the downstream Graph API lead fetch is mocked; the webhook trigger,
-  through Meta's Webhooks test-send feature or the local `sendDemoLead` script,
-  remains a real, Meta-shaped `leadgen` event. The mock is disabled in
+  App-created leads are stored locally in backend memory and labeled as mocks;
+  the webhook demo still posts a Meta-shaped `leadgen` event and only its
+  downstream Graph API lead fetch is mocked. The mock is disabled in
   production.
 - The test Page, Meta app, access token, ngrok account/domain, webhook
   subscription, and Loom recordings are supplied/configured by the operator;

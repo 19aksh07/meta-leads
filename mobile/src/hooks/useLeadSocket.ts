@@ -12,6 +12,7 @@ type ApiResponse = {
   error?: string;
   lead?: Lead;
   leads?: Lead[];
+  mode?: 'mock' | 'meta';
 };
 
 function mergeLead(leads: Lead[], lead: Lead): Lead[] {
@@ -29,6 +30,7 @@ export function useLeadSocket(
 ): {
   leads: Lead[];
   connected: boolean;
+  mode: 'mock' | 'meta';
   loading: boolean;
   creating: boolean;
   deletingId: string | null;
@@ -39,6 +41,7 @@ export function useLeadSocket(
 } {
   const [leads, setLeads] = useState<Lead[]>([]);
   const [connected, setConnected] = useState(false);
+  const [mode, setMode] = useState<'mock' | 'meta'>('meta');
   const [loading, setLoading] = useState(true);
   const [creating, setCreating] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -60,6 +63,7 @@ export function useLeadSocket(
       if (!Array.isArray(payload.leads)) {
         throw new Error('Backend returned an invalid test-leads list');
       }
+      setMode(payload.mode === 'mock' ? 'mock' : 'meta');
       setLeads((current) =>
         payload.leads!.reduce(
           (merged, lead) => mergeLead(merged, lead),
@@ -151,6 +155,7 @@ export function useLeadSocket(
   return {
     leads,
     connected,
+    mode,
     loading,
     creating,
     deletingId,

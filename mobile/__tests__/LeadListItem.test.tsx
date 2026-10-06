@@ -25,4 +25,18 @@ describe('LeadListItem', () => {
     expect(screen.getByText('Grace Hopper')).toBeTruthy();
     expect(screen.getAllByText('—')).toHaveLength(2);
   });
+
+  it('marks local mock leads clearly', () => {
+    render(
+      <LeadListItem
+        lead={{
+          id: 'mock-lead-1',
+          full_name: 'Phone Mock Lead',
+          is_mock_lead: true,
+        }}
+      />,
+    );
+
+    expect(screen.getByText('MOCK')).toBeTruthy();
+  });
 });

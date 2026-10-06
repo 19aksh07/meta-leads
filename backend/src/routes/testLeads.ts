@@ -2,6 +2,7 @@ import { Router } from 'express';
 import {
   createTestLead,
   deleteTestLead,
+  isMockTestLeadMode,
   listTestLeads,
   type TestLeadFields,
 } from '../services/metaTestLeads';
@@ -27,7 +28,10 @@ function readFields(body: unknown): TestLeadFields | null {
 
 router.get('/', async (_req, res) => {
   try {
-    res.json({ leads: await listTestLeads() });
+    res.json({
+      mode: isMockTestLeadMode() ? 'mock' : 'meta',
+      leads: await listTestLeads(),
+    });
   } catch (error) {
     console.error('Failed to list Meta test leads', error);
     res.status(502).json({

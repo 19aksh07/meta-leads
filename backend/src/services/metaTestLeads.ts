@@ -1,3 +1,5 @@
+import { randomUUID } from 'node:crypto';
+
 type MetaFieldData = {
   name: string;
   values: unknown[];
@@ -23,6 +25,15 @@ export type TestLeadFields = {
   email: string;
   phone_number: string;
 };
+
+const mockTestLeads = new Map<string, Record<string, unknown>>();
+
+export function isMockTestLeadMode(): boolean {
+  return (
+    process.env.META_GRAPH_API_MOCK === 'true' &&
+    process.env.NODE_ENV !== 'production'
+  );
+}
 
 function getMetaConfig(): { formId: string; accessToken: string; version: string } {
   const formId = process.env.META_LEADGEN_FORM_ID;
@@ -122,6 +133,10 @@ function normalizeLead(lead: MetaLeadResponse): Record<string, unknown> {
 }
 
 export async function listTestLeads(): Promise<Record<string, unknown>[]> {
+  if (isMockTestLeadMode()) {
+    return Array.from(mockTestLeads.values()).map((lead) => ({ ...lead }));
+  }
+
   const { formId } = getMetaConfig();
   const payload = await requestGraph(
     `${encodeURIComponent(formId)}/test_leads`,
@@ -145,6 +160,20 @@ export async function listTestLeads(): Promise<Record<string, unknown>[]> {
 export async function createTestLead(
   fields: TestLeadFields,
 ): Promise<Record<string, unknown>> {
+  if (isMockTestLeadMode()) {
+    const lead = {
+      id: `mock-${randomUUID()}`,
+      created_time: new Date().toISOString(),
+      full_name: fields.full_name,
+      email: fields.email,
+      phone_number: fields.phone_number,
+      is_test_lead: true,
+      is_mock_lead: true,
+    };
+    mockTestLeads.set(lead.id, lead);
+    return { ...lead };
+  }
+
   const { formId } = getMetaConfig();
   const payload = await requestGraph(
     `${encodeURIComponent(formId)}/test_leads`,
@@ -182,5 +211,12 @@ export async function createTestLead(
 }
 
 export async function deleteTestLead(leadId: string): Promise<void> {
+  if (isMockTestLeadMode()) {
+    if (!mockTestLeads.delete(leadId)) {
+      throw new Error('Mock lead was not found; refresh the lead list');
+    }
+    return;
+  }
+
   await requestGraph(encodeURIComponent(leadId), 'DELETE');
 }

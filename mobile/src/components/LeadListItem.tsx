@@ -26,14 +26,39 @@ function leadTime(createdTime?: string): string {
   });
 }
 
-export function LeadListItem({ lead }: { lead: Lead }) {
+export function LeadListItem({
+  lead,
+  onDelete,
+  deleting = false,
+}: {
+  lead: Lead;
+  onDelete?: () => void;
+  deleting?: boolean;
+}) {
   return (
     <View style={styles.item} testID="lead-item">
       <View style={styles.heading}>
-        <Text style={styles.name} numberOfLines={1}>
-          {leadName(lead)}
-        </Text>
-        <Text style={styles.time}>{leadTime(lead.created_time)}</Text>
+        <View style={styles.nameGroup}>
+          <Text style={styles.name} numberOfLines={1}>
+            {leadName(lead)}
+          </Text>
+          {lead.is_mock_lead ? (
+            <Text style={styles.mockBadge}>MOCK</Text>
+          ) : null}
+        </View>
+        <View style={styles.actions}>
+          <Text style={styles.time}>{leadTime(lead.created_time)}</Text>
+          {onDelete ? (
+            <Text
+              accessibilityRole="button"
+              onPress={onDelete}
+              style={[styles.delete, deleting && styles.deleting]}
+              testID="delete-lead"
+            >
+              {deleting ? '…' : '×'}
+            </Text>
+          ) : null}
+        </View>
       </View>
       <View style={styles.details}>
         <View style={styles.detail}>
@@ -71,6 +96,13 @@ const styles = StyleSheet.create({
     gap: 10,
     justifyContent: 'space-between',
   },
+  nameGroup: {
+    alignItems: 'center',
+    flex: 1,
+    flexDirection: 'row',
+    gap: 7,
+    minWidth: 0,
+  },
   name: {
     color: '#17271F',
     flex: 1,
@@ -81,6 +113,30 @@ const styles = StyleSheet.create({
     color: '#728078',
     fontSize: 10,
     fontWeight: '700',
+  },
+  mockBadge: {
+    backgroundColor: '#FFF0D8',
+    borderRadius: 3,
+    color: '#8A5813',
+    fontSize: 8,
+    fontWeight: '800',
+    overflow: 'hidden',
+    paddingHorizontal: 5,
+    paddingVertical: 3,
+  },
+  actions: {
+    alignItems: 'center',
+    flexDirection: 'row',
+    gap: 9,
+  },
+  delete: {
+    color: '#9A3F37',
+    fontSize: 20,
+    fontWeight: '700',
+    paddingHorizontal: 4,
+  },
+  deleting: {
+    opacity: 0.5,
   },
   details: {
     flexDirection: 'row',

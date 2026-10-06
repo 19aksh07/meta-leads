@@ -13,6 +13,7 @@ import {
 jest.mock('../src/services/metaTestLeads', () => ({
   createTestLead: jest.fn(),
   deleteTestLead: jest.fn(),
+  isMockTestLeadMode: jest.fn(() => false),
   listTestLeads: jest.fn(),
 }));
 
@@ -41,6 +42,7 @@ describe('/api/test-leads', () => {
 
     expect(response.status).toBe(200);
     expect(response.body).toEqual({
+      mode: 'meta',
       leads: [{ id: 'test-lead-1', full_name: 'Test Lead' }],
     });
   });

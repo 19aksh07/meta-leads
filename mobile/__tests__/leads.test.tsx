@@ -96,6 +96,7 @@ describe('LeadsScreen', () => {
         },
       ],
       connected: true,
+      mode: 'meta',
       loading: false,
       creating: false,
       deletingId: null,
@@ -110,5 +111,39 @@ describe('LeadsScreen', () => {
     expect(screen.getByText('Delete test lead to create another')).toBeTruthy();
     fireEvent.press(screen.getByText('Create test lead'));
     expect(createTestLead).not.toHaveBeenCalled();
+  });
+
+  it('labels local mock leads and lets the user delete them', () => {
+    (useLeadSocket as jest.Mock).mockReturnValue({
+      leads: [
+        {
+          id: 'mock-lead-1',
+          full_name: 'Phone Mock Lead',
+          is_test_lead: true,
+          is_mock_lead: true,
+        },
+      ],
+      connected: true,
+      mode: 'mock',
+      loading: false,
+      creating: false,
+      deletingId: null,
+      error: null,
+      refreshLeads,
+      createTestLead,
+      deleteTestLead,
+    });
+
+    render(<LeadsScreen />);
+
+    expect(screen.getByText('Create mock lead')).toBeTruthy();
+    expect(screen.getByText('MOCK')).toBeTruthy();
+    expect(
+      screen.getByText(
+        'Mock leads are local to this backend and clear when it restarts. They are not sent to Meta.',
+      ),
+    ).toBeTruthy();
+    fireEvent.press(screen.getByTestId('delete-lead'));
+    expect(deleteTestLead).toHaveBeenCalledWith('mock-lead-1');
   });
 });

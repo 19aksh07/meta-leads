@@ -31,6 +31,7 @@ export async function fetchLead(
       full_name: "Demo Lead",
       email: "demo@example.com",
       phone_number: "+15551234567",
+      is_mock_lead: true,
     };
   }
 

@@ -21,10 +21,16 @@ You can test the live mobile feed without registering a Meta app or Page. In
 META_GRAPH_API_MOCK=true
 ```
 
-Leave the Page access token empty. Start the backend with `npm run dev`, start
-the Expo app with `EXPO_PUBLIC_SOCKET_URL` set to the computer's reachable
-address, and leave the leads screen open. From another terminal in `backend/`,
-run this command each time you want to send a sample:
+Mock mode does not need a Page token, form ID, Meta account, or public tunnel.
+On the Android leads screen, use **Create mock lead** to add a local lead; it
+appears in the feed and is labeled **MOCK**. You can create multiple leads and
+remove them from the feed. Mock leads are held in backend memory and are
+cleared when the backend restarts.
+
+Start the backend with `npm run dev`, start the Expo app with
+`EXPO_PUBLIC_SOCKET_URL` set to the computer's reachable address, and leave
+the leads screen open. From another terminal in `backend/`, run this command
+to separately test the webhook path:
 
 ```powershell
 npm run demo:lead
@@ -33,10 +39,9 @@ npm run demo:lead
 The sender POSTs a Meta-shaped fixture to the existing webhook route. The
 backend acknowledges it, uses a local `Demo Lead` in place of Graph API, and
 broadcasts it over the real Socket.io connection to the app. Keep this mode
-local: do not run a public tunnel or expose the mock-enabled server. This
-validates the app and realtime plumbing, but it does **not** satisfy the
-requirement to submit through Meta's Lead Ads Testing Tool or prove Meta
-credentials/webhook configuration.
+local: do not run a public tunnel or expose the mock-enabled server. These
+flows validate the app and realtime plumbing, but do **not** submit leads to
+Meta or prove Meta credentials/webhook configuration.
 
 ### Configure Meta
 
@@ -134,11 +139,11 @@ npm start
 ```
 
 Scan Expo's QR code with Expo Go, or press `a` to open a configured Android
-emulator. Leave the app on the leads screen. Confirm the connection indicator
-shows **LIVE**. The screen can create, list, and delete a Meta test lead without
-leaving the Android app. Configure `META_PAGE_ACCESS_TOKEN` and
-`META_LEADGEN_FORM_ID` in `backend/.env` first; the token remains on the
-backend.
+emulator. Leave the app on the leads screen and confirm the connection
+indicator shows **LIVE**. In mock mode, the app creates, lists, and deletes
+local leads without a Meta form or token. For actual Meta test leads, set
+`META_GRAPH_API_MOCK=false` and configure `META_PAGE_ACCESS_TOKEN` and
+`META_LEADGEN_FORM_ID` in `backend/.env`; the token remains on the backend.
 
 Meta allows only one test lead per form. Delete the existing test lead from the
 app before creating another. These are fake testing leads, not real ad
