@@ -1,8 +1,9 @@
 # Assumptions
 
 - One backend instance and one Meta Page are used for this proof of concept.
-- There is no database. Leads remain in the app's in-memory list and are lost
-  when the app restarts; persistence could be added with Postgres or SQLite.
+- There is no database. Mock leads are stored in a `Map` in the backend
+  process's memory and are lost when the backend restarts; persistence could
+  be added with Postgres or SQLite.
 - Socket connections and the leads screen are unauthenticated. Authentication
   and tenant isolation are outside this demonstration's scope.
 - Meta's `leadgen` webhook change contains lead identifiers, not form answers.
@@ -15,6 +16,9 @@
   the webhook demo still posts a Meta-shaped `leadgen` event and only its
   downstream Graph API lead fetch is mocked. The mock is disabled in
   production.
+- The Android app can create, list, display, and delete local mock leads through
+  the backend API. These records are not sent to Meta and do not represent
+  actual form submissions.
 - The test Page, Meta app, access token, ngrok account/domain, webhook
   subscription, and Loom recordings are supplied/configured by the operator;
   they are not part of the source repository.
