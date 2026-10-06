@@ -35,10 +35,10 @@ export async function fetchLead(
   }
 
   const accessToken =
-    process.env.META_USER_ACCESS_TOKEN || process.env.META_PAGE_ACCESS_TOKEN;
+    process.env.META_PAGE_ACCESS_TOKEN || process.env.META_USER_ACCESS_TOKEN;
   if (!accessToken) {
     throw new Error(
-      "META_USER_ACCESS_TOKEN or META_PAGE_ACCESS_TOKEN is not configured",
+      "META_PAGE_ACCESS_TOKEN or META_USER_ACCESS_TOKEN is not configured",
     );
   }
 

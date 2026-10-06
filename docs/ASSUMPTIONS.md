@@ -9,9 +9,12 @@
   The backend retrieves the submitted fields separately with the Graph API.
 - The demonstration uses Meta's Lead Ads Testing Tool, not a live ad. No ad
   spend or real user data is required.
-- A local `META_GRAPH_API_MOCK=true` mode exists for development without Meta
-  credentials. It is disabled in production and does not count as the required
-  Lead Ads Testing Tool demonstration.
+- `META_GRAPH_API_MOCK=true` is used because creating Instant Forms requires a
+  connected, verified Business Portfolio, which is out of scope for this PoC.
+  Only the downstream Graph API lead fetch is mocked; the webhook trigger,
+  through Meta's Webhooks test-send feature or the local `sendDemoLead` script,
+  remains a real, Meta-shaped `leadgen` event. The mock is disabled in
+  production.
 - The test Page, Meta app, access token, ngrok account/domain, webhook
   subscription, and Loom recordings are supplied/configured by the operator;
   they are not part of the source repository.

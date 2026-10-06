@@ -32,7 +32,23 @@ describe('fetchLead', () => {
     expect(url.searchParams.get('access_token')).toBe('page-token');
   });
 
-  it('prefers the configured long-lived user token over the legacy Page token', async () => {
+  it('prefers the Page Access Token over a configured user token', async () => {
+    process.env.META_USER_ACCESS_TOKEN = 'long-lived-user-token';
+    fetchMock.mockResolvedValue({
+      ok: true,
+      status: 200,
+      json: async () => ({ id: 'lead-123', field_data: [] }),
+    } as Response);
+
+    await fetchLead('lead-123');
+
+    const [requestUrl] = fetchMock.mock.calls[0];
+    const url = new URL(requestUrl as string);
+    expect(url.searchParams.get('access_token')).toBe('page-token');
+  });
+
+  it('falls back to the user token when no Page Access Token is set', async () => {
+    delete process.env.META_PAGE_ACCESS_TOKEN;
     process.env.META_USER_ACCESS_TOKEN = 'long-lived-user-token';
     fetchMock.mockResolvedValue({
       ok: true,
@@ -108,7 +124,7 @@ describe('fetchLead', () => {
 
     try {
       await expect(fetchLead('demo-123')).rejects.toThrow(
-        'META_USER_ACCESS_TOKEN or META_PAGE_ACCESS_TOKEN is not configured',
+        'META_PAGE_ACCESS_TOKEN or META_USER_ACCESS_TOKEN is not configured',
       );
       expect(fetchMock).not.toHaveBeenCalled();
     } finally {
