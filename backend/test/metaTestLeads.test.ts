@@ -187,4 +187,14 @@ describe('Meta test-lead Graph API', () => {
     );
     expect(fetchMock).not.toHaveBeenCalled();
   });
+
+  it('rejects the example form-ID placeholder before calling Graph API', async () => {
+    process.env.META_LEADGEN_FORM_ID =
+      'replace-with-the-page-lead-form-id';
+
+    await expect(listTestLeads()).rejects.toThrow(
+      'META_LEADGEN_FORM_ID is still a placeholder; set it to the numeric ID of your Page lead form',
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
 });

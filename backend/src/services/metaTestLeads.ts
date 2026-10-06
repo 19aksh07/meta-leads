@@ -31,6 +31,11 @@ function getMetaConfig(): { formId: string; accessToken: string; version: string
   if (!formId) {
     throw new Error('META_LEADGEN_FORM_ID is not configured');
   }
+  if (/^(replace-with|your-|<.*>)/i.test(formId.trim())) {
+    throw new Error(
+      'META_LEADGEN_FORM_ID is still a placeholder; set it to the numeric ID of your Page lead form',
+    );
+  }
   if (!accessToken) {
     throw new Error('META_PAGE_ACCESS_TOKEN is not configured');
   }
@@ -118,7 +123,10 @@ function normalizeLead(lead: MetaLeadResponse): Record<string, unknown> {
 
 export async function listTestLeads(): Promise<Record<string, unknown>[]> {
   const { formId } = getMetaConfig();
-  const payload = await requestGraph(`${encodeURIComponent(formId)}/test_leads`, 'GET');
+  const payload = await requestGraph(
+    `${encodeURIComponent(formId)}/test_leads`,
+    'GET',
+  );
 
   if (
     !payload ||
@@ -151,7 +159,8 @@ export async function createTestLead(
   if (typeof result.id !== 'string') {
     const leads = await listTestLeads();
     const createdLead = leads.find(
-      (lead) => lead.email === fields.email && lead.full_name === fields.full_name,
+      (lead) =>
+        lead.email === fields.email && lead.full_name === fields.full_name,
     );
     if (createdLead) {
       return createdLead;
